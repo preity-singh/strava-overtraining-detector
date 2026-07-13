@@ -1,3 +1,9 @@
+"""
+This module provides functions to interact with the Strava API, 
+including generating the authorization URL for OAuth, 
+exchanging the authorization code for an access token, 
+and retrieving the athlete's activities using the access token.
+"""
 import requests 
 import os
 from dotenv import load_dotenv
