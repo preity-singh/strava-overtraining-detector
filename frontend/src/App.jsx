@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import ConnectButton from './ConnectButton';
+import Dashboard from './Dashboard';
 
 function App() {
   const [dashboardData, setDashboardData] = useState(null);
@@ -30,7 +31,7 @@ function App() {
     <div>
       {dashboardData === null && !loading && <ConnectButton onConnect={handleConnect} />}
       {loading && <p>Loading your dashboard...</p>}
-      {dashboardData && <pre>{JSON.stringify(dashboardData, null, 2)}</pre>}
+      {dashboardData && <Dashboard data={dashboardData} />}
     </div>
   );
 }
