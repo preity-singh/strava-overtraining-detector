@@ -8,7 +8,7 @@ function Dashboard({ data }) {
   };
 
   return (
-    <div style={{ maxWidth: '700px', margin: '0 auto', padding: '2rem' }}>
+    <div style={{ maxWidth: '700px', margin: '0 auto', padding: '2rem' , background: '#0f172a', minHeight: '100vh', color: '#e2e8f0' }}>
       <h1 style={{ textTransform: 'capitalize', color: riskColors[data.risk_level] }}>
         {data.risk_level} risk
       </h1>
@@ -30,8 +30,8 @@ function Dashboard({ data }) {
         <XAxis dataKey="week" tick={{ fontSize: 11 }} />
         <YAxis />
         <Tooltip />
-        <ReferenceLine y={1.3} stroke="#d97706" strokeDasharray="4 4" />
-        <ReferenceLine y={1.5} stroke="#dc2626" strokeDasharray="4 4" />
+        <ReferenceLine y={1.3} stroke="#d97706" strokeWidth={1.5} strokeDasharray="4 4" label={{ value: 'Moderate risk', position: 'right', fill: '#d97706', fontSize: 11 }} />
+        <ReferenceLine y={1.5} stroke="#dc2626" strokeWidth={1.5} strokeDasharray="4 4" label={{ value: 'High risk', position: 'right', fill: '#dc2626', fontSize: 11 }} />
         <Line type="monotone" dataKey="acwr" stroke="#2563eb" strokeWidth={2} dot={{ r: 3 }} />
       </LineChart>
 
