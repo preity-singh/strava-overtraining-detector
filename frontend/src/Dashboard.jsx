@@ -8,7 +8,7 @@ function Dashboard({ data }) {
   };
 
   return (
-    <div style={{ maxWidth: '700px', margin: '0 auto', padding: '2rem' , background: '#0f172a', minHeight: '100vh', color: '#e2e8f0' }}>
+    <div style={{ maxWidth: '700px', margin: '0 auto', padding: '2rem'  }}>
       <h1 style={{ textTransform: 'capitalize', color: riskColors[data.risk_level] }}>
         {data.risk_level} risk
       </h1>
