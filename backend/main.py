@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 
 from strava import get_authorization_url, exchange_code_for_token, get_activities
 from metrics import clean_activities, load_acitvities, compute_weekly_mileage, fill_missing_weeks, compute_acwr, get_summary
@@ -20,8 +21,14 @@ def login():
     auth_url = get_authorization_url(redirect_uri)
     return {"auth_url": auth_url}
 
+
 @app.get("/callback")
 def callback(code: str):
+    return RedirectResponse(url=f"http://localhost:5173?code={code}")
+
+
+@app.get("/process")
+def process(code: str):
     token_data = exchange_code_for_token(code)
     access_token = token_data['access_token']
 
