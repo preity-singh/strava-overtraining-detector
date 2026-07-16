@@ -1,22 +1,25 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ConnectButton from './ConnectButton';
 import Dashboard from './Dashboard';
 
 function App() {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const hasProcessed = useRef(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const code = params.get('code');
 
-    if (code) {
+    if (code && !hasProcessed.current) {
+      hasProcessed.current = true;
       setLoading(true);
       fetch(`http://localhost:8000/process?code=${code}`)
         .then((response) => response.json())
         .then((data) => {
           setDashboardData(data);
           setLoading(false);
+          window.history.replaceState({}, '', '/');
         });
     }
   }, []);

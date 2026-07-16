@@ -30,6 +30,8 @@ def callback(code: str):
 @app.get("/process")
 def process(code: str):
     token_data = exchange_code_for_token(code)
+    if 'access_token' not in token_data:
+        return {"error": "Authorization failed or code already used. Please reconnect."}
     access_token = token_data['access_token']
 
     activities_raw = get_activities(access_token)
