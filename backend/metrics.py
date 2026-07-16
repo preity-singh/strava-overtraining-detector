@@ -5,12 +5,9 @@ import json
 from datetime import datetime, timedelta
 from collections import defaultdict
 
-# Load and clean up activities from a JSON file
-def load_acitvities(file_path):
-    with open(file_path, 'r') as f:
-        raw = json.load(f)
-    
-    activities = [] # list for cleaned up runs
+# Clean to include runs and miles to minutes
+def clean_activities(raw):
+    activities = []
     for a in raw:
         if a['type'] != 'Run':
             continue
@@ -19,8 +16,13 @@ def load_acitvities(file_path):
             'miles': round(a['distance'] / 1609.344, 2),
             'minutes': round(a['moving_time'] / 60, 1)
         })
-
     return sorted(activities, key=lambda x: x['date'])
+
+# Load activities from a JSON file and clean them
+def load_acitvities(file_path):
+    with open(file_path, 'r') as f:
+        raw = json.load(f)
+    return clean_activities(raw)
 
 # Get the start of the week for a given date
 def get_week_start(date):
@@ -64,17 +66,20 @@ def compute_acwr(weekly_mileage):
         last_4_weeks = [weekly_mileage.get(weeks[j], 0) for j in range(i-3, i+1)] # last 4 weeks mileage
         chronic = sum(last_4_weeks) / 4 # average of last 4
 
+        if acute == 0:
+            continue
+
         if chronic == 0:
-            acr = 0.0
+            acwr = 0.0
+            risk = 'Moderate Risk'
         else: 
             acwr = round(acute / chronic, 2)
-        
-        if acwr > 1.5:
-            risk = 'High Risk'
-        elif acwr > 1.3:
-            risk = 'Moderate Risk'
-        else:
-            risk = 'Low Risk'
+            if acwr > 1.5:
+                risk = 'High Risk'
+            elif acwr > 1.3:
+                risk = 'Moderate Risk'
+            else:
+                risk = 'Low Risk'
         
         results.append({
             'week': week.strftime('%Y-%m-%d'),
@@ -112,6 +117,7 @@ if __name__ == "__main__":
     print(f"Loaded {len(activities)} runs\n")
 
     weekly_mileage = compute_weekly_mileage(activities)
+    weekly_mileage = fill_missing_weeks(weekly_mileage)
     print("Weekly Mileage:")
     for week, miles in weekly_mileage.items():
         print(f"  {week}: {miles} miles")
