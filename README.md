@@ -56,18 +56,21 @@ npm install
 npm run dev
 ```
 
-You'll need a `.env` file in `backend/` with:
-```
-STRAVA_CLIENT_ID=your_client_id
-STRAVA_CLIENT_SECRET=your_client_secret
-GROQ_API_KEY=your_groq_key
+You'll need environment variables configured. Copy the example file and fill in your credentials:
+
+```bash
+cp .env.example .env
 ```
 
-Get Strava credentials at [strava.com/settings/api](https://www.strava.com/settings/api), and a free Groq key at [console.groq.com](https://console.groq.com).
+Then edit `.env` with your actual values. Get Strava credentials at [strava.com/settings/api](https://www.strava.com/settings/api), and a free Groq key at [console.groq.com](https://console.groq.com).
 
 ## A note on Strava API access
 
 As of June 2026, Strava requires an active paid subscription to maintain developer API access. This project was built and tested with a live subscription; if you're viewing this after that subscription has lapsed, the live OAuth flow may no longer be active. The screenshots above and a recorded demo reflect the fully working app.
+
+## Deployment
+
+Deployed with Railway (backend) and Vercel (frontend). The backend uses `BACKEND_URL` and `FRONTEND_URL` environment variables so the same code works both locally and in production. The frontend uses `VITE_BACKEND_URL` to know where to send API requests. Strava's Authorization Callback Domain is set to the Railway domain, since that's the URL Strava actually redirects to.
 
 ## What I'd build next
 
