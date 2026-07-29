@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import ConnectButton from './ConnectButton';
 import Dashboard from './Dashboard';
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+
 function App() {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -14,7 +16,7 @@ function App() {
     if (code && !hasProcessed.current) {
       hasProcessed.current = true;
       setLoading(true);
-      fetch(`http://localhost:8000/process?code=${code}`)
+      fetch(`${BACKEND_URL}/process?code=${code}`)
         .then((response) => response.json())
         .then((data) => {
           setDashboardData(data);
@@ -25,7 +27,7 @@ function App() {
   }, []);
 
   async function handleConnect() {
-    const response = await fetch('http://localhost:8000/login');
+    const response = await fetch(`${BACKEND_URL}/login`);
     const data = await response.json();
     window.location.href = data.auth_url;
   }

@@ -19,7 +19,7 @@ def clean_activities(raw):
     return sorted(activities, key=lambda x: x['date'])
 
 # Load activities from a JSON file and clean them
-def load_acitvities(file_path):
+def load_activities(file_path):
     with open(file_path, 'r') as f:
         raw = json.load(f)
     return clean_activities(raw)
@@ -72,7 +72,8 @@ def compute_acwr(weekly_mileage):
         if chronic == 0:
             acwr = 0.0
             risk = 'Moderate Risk'
-        else: 
+            note = 'returning_from_break'
+        else:
             acwr = round(acute / chronic, 2)
             if acwr > 1.5:
                 risk = 'High Risk'
@@ -80,13 +81,15 @@ def compute_acwr(weekly_mileage):
                 risk = 'Moderate Risk'
             else:
                 risk = 'Low Risk'
-        
+            note = None
+
         results.append({
             'week': week.strftime('%Y-%m-%d'),
             'acute_miles': acute,
             "chronic_avg_miles": round(chronic, 1),
             'acwr': acwr,
-            'risk': risk
+            'risk': risk,
+            'note': note
         })
 
     return results 
@@ -113,7 +116,7 @@ def get_summary(acwr_results):
 
 # ----------------
 if __name__ == "__main__":
-    activities = load_acitvities('data/synthetic_activities.json')
+    activities = load_activities('data/synthetic_activities.json')
     print(f"Loaded {len(activities)} runs\n")
 
     weekly_mileage = compute_weekly_mileage(activities)
