@@ -64,24 +64,31 @@ def compute_acwr(weekly_mileage):
 
         acute = weekly_mileage[week] # current week mileage
         last_4_weeks = [weekly_mileage.get(weeks[j], 0) for j in range(i-3, i+1)] # last 4 weeks mileage
+        prior_3_weeks = [weekly_mileage.get(weeks[j], 0) for j in range(i-3, i)] # prior 3 weeks only
         chronic = sum(last_4_weeks) / 4 # average of last 4
 
         if acute == 0:
             continue
 
-        if chronic == 0:
+        # Check if returning from extended break (prior 3 weeks all 0, but current week > 0)
+        if sum(prior_3_weeks) == 0 and acute > 0:
             acwr = 0.0
-            risk = 'Moderate Risk'
-            note = 'returning_from_break'
+            risk = 'High Risk'
+            note = "You're returning from an extended break — your body hasn't been under load recently, so even a modest week carries more risk than the mileage suggests. Build back gradually over the next several weeks."
         else:
             acwr = round(acute / chronic, 2)
             if acwr > 1.5:
                 risk = 'High Risk'
+                note = None
             elif acwr > 1.3:
                 risk = 'Moderate Risk'
+                note = None
+            elif acwr >= 0.8:
+                risk = 'Optimal'
+                note = None
             else:
-                risk = 'Low Risk'
-            note = None
+                risk = 'Reduced Conditioning'
+                note = "Your recent training is below your usual baseline. That's fine right now, but if you're planning to ramp up, take it gradually — your body may need a few weeks to readjust before handling bigger loads comfortably."
 
         results.append({
             'week': week.strftime('%Y-%m-%d'),
@@ -128,8 +135,7 @@ if __name__ == "__main__":
     acwr_results = compute_acwr(weekly_mileage)
     print("\nACWR Results:")
     for r in acwr_results:
-        flag = 'HIGH' if r['risk'] == 'High Risk' else 'MODERATE' if r['risk'] == 'Moderate Risk' else 'LOW'
-        print(f" {r['week']}: ACWR={r['acwr']} {flag} (acute={r['acute_miles']}mi, chronic avg={r['chronic_avg_miles']}mi)")
+        print(f" {r['week']}: ACWR={r['acwr']} {r['risk']} (acute={r['acute_miles']}mi, chronic avg={r['chronic_avg_miles']}mi)")
 
     summary = get_summary(acwr_results)
     print("\nSummary:")
