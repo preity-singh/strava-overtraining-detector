@@ -198,21 +198,27 @@
 }
 
 /* ─── Chart ─── */
-.chart-container {
-  width: 100%;
+.chart-scroll-wrapper {
+  overflow-x: auto;
   margin-bottom: 2rem;
   border-radius: 12px;
   background: var(--code-bg);
+  -webkit-overflow-scrolling: touch;
+}
+
+.chart-container {
   padding: 1.25rem 0.5rem 0.75rem 0;
   box-sizing: border-box;
 }
 
 @media (max-width: 480px) {
-  .chart-container {
-    padding: 1rem 0 0.5rem 0;
+  .chart-scroll-wrapper {
     margin-left: -0.5rem;
     margin-right: -0.5rem;
     border-radius: 8px;
+  }
+  .chart-container {
+    padding: 1rem 0 0.5rem 0;
   }
 }
 
