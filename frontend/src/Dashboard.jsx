@@ -65,7 +65,7 @@ function Dashboard({ data }) {
       </div>
 
       <div className="chart-scroll-wrapper">
-        <div className="chart-container" style={{ minWidth: Math.max(600, data.timeline.length * 50) }}>
+        <div className="chart-container" style={{ minWidth: data.timeline.length > 20 ? data.timeline.length * 45 : undefined }}>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={data.timeline} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
