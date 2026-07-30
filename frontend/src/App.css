@@ -18,6 +18,7 @@
 @media (max-width: 480px) {
   .landing h1 {
     font-size: 1.75rem;
+    line-height: 1.25;
   }
 }
 
@@ -94,6 +95,7 @@
 /* ─── ACWR info toggle ─── */
 .acwr-info {
   margin-bottom: 1.5rem;
+  text-align: left;
 }
 
 .acwr-info-toggle {
