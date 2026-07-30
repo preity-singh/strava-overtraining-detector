@@ -55,8 +55,19 @@ def process(code: str):
 
         coaching_note = get_coaching_note(summary)
 
+        recent = acwr_results[-3:]
+        risk_priority = ['High Risk', 'Moderate Risk', 'Reduced Conditioning', 'Optimal']
+        worst_risk = next(r for r in risk_priority if any(w['risk'] == r for w in recent))
+        risk_level_map = {
+            'High Risk': 'high',
+            'Moderate Risk': 'moderate',
+            'Optimal': 'optimal',
+            'Reduced Conditioning': 'reduced_conditioning',
+        }
+        risk_level = risk_level_map[worst_risk]
+
         return {
-            "risk_level": "high" if summary['high_risk_weeks'] > 0 else "moderate" if summary['moderate_risk_weeks'] > 0 else "low",
+            "risk_level": risk_level,
             "peak_acwr": summary['peak_acwr'],
             "peak_week": summary['peak_week'],
             "high_risk_weeks": summary['high_risk_weeks'],
