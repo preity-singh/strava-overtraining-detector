@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine } from 'recharts';
 
 function Dashboard({ data }) {
@@ -28,11 +29,25 @@ function Dashboard({ data }) {
     );
   };
 
+  const [acwrOpen, setAcwrOpen] = useState(false);
+
   return (
     <div className="dashboard">
       <h1 className="dashboard-headline" style={{ color: riskColors[data.risk_level] }}>
         {riskLabels[data.risk_level] || data.risk_level}
       </h1>
+
+      <div className="acwr-info">
+        <button className="acwr-info-toggle" onClick={() => setAcwrOpen(!acwrOpen)}>
+          <span className="acwr-info-icon">i</span> What is ACWR?
+        </button>
+        {acwrOpen && (
+          <p className="acwr-info-body">
+            ACWR (Acute:Chronic Workload Ratio) compares your recent training load to your longer-term average, to flag injury risk from sudden increases.{' '}
+            <a href="https://www.scienceforsport.com/acutechronic-workload-ratio/" target="_blank" rel="noopener noreferrer">Learn more</a>
+          </p>
+        )}
+      </div>
 
       <div className="stat-row">
         <div className="stat-card">
