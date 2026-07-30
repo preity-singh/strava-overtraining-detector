@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import ConnectButton from './ConnectButton';
 import Dashboard from './Dashboard';
+import './App.css';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
 
@@ -35,7 +36,7 @@ function App() {
   return (
     <div>
       {dashboardData === null && !loading && <ConnectButton onConnect={handleConnect} />}
-      {loading && <p>Loading your dashboard...</p>}
+      {loading && <div className="loading"><p>Loading your dashboard...</p></div>}
       {dashboardData && <Dashboard data={dashboardData} />}
     </div>
   );
