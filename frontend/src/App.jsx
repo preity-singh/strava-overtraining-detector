@@ -38,6 +38,13 @@ function App() {
       {dashboardData === null && !loading && <ConnectButton onConnect={handleConnect} />}
       {loading && <div className="loading"><p>Loading your dashboard...</p></div>}
       {dashboardData && <Dashboard data={dashboardData} />}
+      <footer className="site-footer">
+        Built by <a href="https://www.linkedin.com/in/preity-singh/" target="_blank" rel="noopener noreferrer">Preity Singh</a>
+        <span className="footer-sep">&middot;</span>
+        <a href="https://github.com/preity-singh" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <span className="footer-sep">&middot;</span>
+        React + FastAPI + Groq
+      </footer>
     </div>
   );
 }
