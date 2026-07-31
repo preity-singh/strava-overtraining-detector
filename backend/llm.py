@@ -39,7 +39,14 @@ def get_coaching_note(summary):
 
     ACWR (Acute:Chronic Workload Ratio) compares a runner's current week to their 4-week average. The five bands are: below 0.8 is Reduced Conditioning (risk is about a future ramp-up, not current load); 0.8–1.3 is Optimal; above 1.3 is Moderate Risk; above 1.5 is High Risk; and Returning (coming back after an extended break — no meaningful ratio, just a note to ease back in gradually).
 
-    Write a short, conversational coaching note (3-4 sentences) explaining what this data means for this runner. If there were multiple risk periods with different causes, mention both. Be specific about numbers. Do NOT frame reduced conditioning as "you should have run more" — it's a heads-up about future risk, not a criticism. Do NOT frame Returning weeks as alarming — it's just a gentle reminder to build back gradually. If everything was in the optimal range, say so plainly and encourage consistency."""
+    Write a 2-3 sentence coaching note summarizing what this history means for this runner going forward. Rules:
+    - Be specific: use actual mileage numbers and dates from the data
+    - Use the 10% rule: when suggesting increases, recommend ~10% over the most recent week
+    - Frame everything as forward-looking guidance, not criticism of past behavior
+    - Do NOT frame reduced conditioning or returning as problems — they're just context for what comes next
+    - Do NOT use vague phrases like "be mindful" or "avoid setbacks" — give a concrete number or action
+    - If everything was optimal, say so plainly in one sentence and encourage consistency
+    - Do NOT start with "Based on your training data" or similar throat-clearing"""
 
     try:
         response = client.chat.completions.create(

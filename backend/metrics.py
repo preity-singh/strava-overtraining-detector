@@ -73,21 +73,24 @@ def compute_acwr(weekly_mileage):
         if sum(prior_3_weeks) == 0 and acute > 0:
             acwr = 0.0
             risk = 'Returning'
-            note = "You're coming back from a break — start small and build gradually over the next few weeks."
+            suggested = round(acute * 1.1, 1)
+            note = f"Coming back from a break — aim for around {suggested}mi next week rather than jumping back to your old average."
         else:
             acwr = round(acute / chronic, 2)
             if acwr > 1.5:
                 risk = 'High Risk'
-                note = f"Sharp spike — {acute}mi vs your {round(chronic, 1)}mi average. Back off to reduce injury risk."
+                safe_target = round(chronic * 1.3, 1)
+                note = f"Sharp spike — {acute}mi vs your {round(chronic, 1)}mi average. Dial back toward {safe_target}mi next week."
             elif acwr > 1.3:
                 risk = 'Moderate Risk'
-                note = f"Load rising faster than ideal — {acute}mi vs {round(chronic, 1)}mi average. Worth watching."
+                note = f"Load creeping up — {acute}mi vs {round(chronic, 1)}mi average. Hold steady or ease back slightly."
             elif acwr >= 0.8:
                 risk = 'Optimal'
-                note = "Training load is well-balanced — keep this consistency going."
+                note = "Well-balanced load — keep this consistency going."
             else:
                 risk = 'Reduced Conditioning'
-                note = "Ease back in gradually — your body has lost some tolerance for higher mileage."
+                suggested = round(acute * 1.1, 1)
+                note = f"Below baseline — aim for around {suggested}mi next week rather than jumping back to your old average."
 
         results.append({
             'week': week.strftime('%Y-%m-%d'),
