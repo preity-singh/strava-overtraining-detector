@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine } from 'recharts';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ReferenceArea } from 'recharts';
 
 function Dashboard({ data }) {
   const riskColors = {
@@ -7,6 +7,7 @@ function Dashboard({ data }) {
     moderate: '#d97706',
     optimal: '#16a34a',
     reduced_conditioning: '#6366f1',
+    returning: '#f59e0b',
   };
 
   const riskLabels = {
@@ -14,6 +15,7 @@ function Dashboard({ data }) {
     moderate: 'Moderate Risk',
     optimal: 'Optimal',
     reduced_conditioning: 'Reduced Conditioning',
+    returning: 'Returning',
   };
 
   const CustomTooltip = ({ active, payload }) => {
@@ -69,6 +71,7 @@ function Dashboard({ data }) {
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={data.timeline} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <ReferenceArea y1={0.8} y2={1.3} fill="#16a34a" fillOpacity={0.08} />
               <XAxis dataKey="week" tick={{ fontSize: 11, fill: 'var(--text)' }} />
               <YAxis tick={{ fontSize: 11, fill: 'var(--text)' }} />
               <Tooltip content={<CustomTooltip />} />

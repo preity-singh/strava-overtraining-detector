@@ -72,8 +72,8 @@ def compute_acwr(weekly_mileage):
 
         if sum(prior_3_weeks) == 0 and acute > 0:
             acwr = 0.0
-            risk = 'High Risk'
-            note = "Ease back in gradually — your body has lost tolerance for load during the break."
+            risk = 'Returning'
+            note = "You're coming back from a break — start small and build gradually over the next few weeks."
         else:
             acwr = round(acute / chronic, 2)
             if acwr > 1.5:
