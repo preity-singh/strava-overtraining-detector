@@ -55,7 +55,7 @@ def process(code: str):
 
         coaching_note = get_coaching_note(summary)
 
-        recent = [w for w in acwr_results[-3:] if w['risk'] is not None]
+        recent = acwr_results[-3:]
         risk_priority = ['High Risk', 'Moderate Risk', 'Reduced Conditioning', 'Optimal']
         worst_risk = next((r for r in risk_priority if any(w['risk'] == r for w in recent)), 'Optimal')
         risk_level_map = {

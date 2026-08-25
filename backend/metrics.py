@@ -76,15 +76,6 @@ def compute_acwr(weekly_mileage, activities):
             continue
 
         if acute == 0:
-            results.append({
-                'week': week.strftime('%Y-%m-%d'),
-                'acute_miles': 0,
-                'chronic_avg_miles': round(chronic_ewma, 1),
-                'acwr': None,
-                'risk': None,
-                'note': None,
-                'runs': []
-            })
             continue
 
         acwr = round(acute / chronic_ewma, 2)
@@ -120,16 +111,15 @@ def compute_acwr(weekly_mileage, activities):
     return results
 
 def get_summary(acwr_results):
-    scored = [r for r in acwr_results if r['acwr'] is not None]
-    if not scored:
+    if not acwr_results:
         return {'error': 'Not enough data to compute ACWR. At least 4 weeks of data is required.'}
 
-    high_risk = [r for r in scored if r['risk'] == 'High Risk']
-    moderate_risk = [r for r in scored if r['risk'] == 'Moderate Risk']
-    peak = max(scored, key=lambda x: x['acwr'])
+    high_risk = [r for r in acwr_results if r['risk'] == 'High Risk']
+    moderate_risk = [r for r in acwr_results if r['risk'] == 'Moderate Risk']
+    peak = max(acwr_results, key=lambda x: x['acwr'])
 
     return {
-        'total_weeks': len(scored),
+        'total_weeks': len(acwr_results),
         'high_risk_weeks': len(high_risk),
         'moderate_risk_weeks': len(moderate_risk),
         'peak_acwr': peak['acwr'],
