@@ -1,4 +1,5 @@
 import os
+from datetime import date
 from groq import Groq
 from dotenv import load_dotenv
 
@@ -27,23 +28,26 @@ def get_coaching_note(summary):
         f"{summary['high_risk_weeks']} high risk, {summary['moderate_risk_weeks']} moderate risk. "
         f"Peak ACWR: {summary['peak_acwr']} (week of {summary['peak_week']}, "
         f"{summary['peak_acute_miles']}mi vs {summary['peak_chronic_avg_miles']}mi chronic avg). "
-        f"Most recent week: {last_week['week']}, {last_week['acute_miles']}mi, ACWR {last_week['acwr']}.\n\n"
+        f"Today's date: {date.today().strftime('%Y-%m-%d')}. "
+        f"Most recent run: {last_week['week']} ({last_week['acute_miles']}mi, ACWR {last_week['acwr']}).\n\n"
         f"Flagged weeks:\n{risk_weeks_text}{reduced_context}\n\n"
-        "Write a 2-3 sentence coaching note for this runner. "
-        "Be specific with mileage numbers and dates. "
-        "Use the 10% rule for suggested increases. "
-        "Focus on what to do next, not what went wrong. "
-        "No throat-clearing openers."
+        "Write a 2-3 sentence coaching note for this runner. Rules:\n"
+        "- Write like a friendly running coach talking to a recreational runner. Plain language, no jargon.\n"
+        "- Use complete sentences only. No em-dashes, no bullet points.\n"
+        "- Reference specific mileage numbers. Use readable dates like 'last week' or 'early January' not '2026-01-05'.\n"
+        "- Give one clear action item for next week based on the 10% rule.\n"
+        "- If the most recent run was several weeks ago, acknowledge the break and suggest a safe mileage to come back at (e.g. 'Since it has been a few weeks since your last run, aim for around X miles to ease back in').\n"
+        "- End with a complete thought. Do not trail off."
     )
 
     fallback = f"Your training data shows {summary['high_risk_weeks']} high-risk weeks and {summary['moderate_risk_weeks']} moderate-risk weeks out of {summary['total_weeks']} analyzed."
 
     try:
         response = client.chat.completions.create(
-            model="openai/gpt-oss-120b",
+            model="groq/compound-mini",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.7,
-            max_tokens=300
+            max_tokens=500
         )
         content = response.choices[0].message.content
         if content and content.strip():
