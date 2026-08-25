@@ -48,7 +48,7 @@ function Dashboard({ data }) {
         </button>
         {acwrOpen && (
           <p className="acwr-info-body">
-            ACWR (Acute:Chronic Workload Ratio) compares your recent training load to your longer-term average, to flag injury risk from sudden increases.{' '}
+            ACWR (Acute:Chronic Workload Ratio) compares your current week's mileage to a weighted average of your recent weeks, where newer weeks count more than older ones (a method called EWMA, or Exponentially Weighted Moving Average). This reflects how fitness actually works — it builds up gradually and fades slowly, not all at once. A spike relative to your recent baseline flags injury risk.{' '}
             <a href="https://www.scienceforsport.com/acutechronic-workload-ratio/" target="_blank" rel="noopener noreferrer">Learn more</a>
           </p>
         )}
