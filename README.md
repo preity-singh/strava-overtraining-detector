@@ -1,12 +1,12 @@
 # Training Load Insights
 
-Connect your Strava to see how your running load has shifted over time, spot risky spikes before they become injuries, and get a personalized coaching note — all from your real data.
+Connect your Strava to see how your running load has shifted over time, spot risky spikes before they become injuries, and get a personalized coaching note, all from your real data.
 
 ![Landing page](images/TitlePage.png)
 
 ## The Problem
 
-Runners increase mileage too quickly all the time — often without realizing it, especially after a break. This is one of the most common causes of running injuries, and it's invisible unless you're tracking it deliberately.
+Runners increase mileage too quickly all the time and often without realizing it, especially after a break. This is one of the most common causes of running injuries, and it's invisible unless you're tracking it deliberately.
 
 ## The Approach: ACWR
 
@@ -107,11 +107,10 @@ As of June 2026, Strava requires an active paid subscription for developer API a
 
 ## Why ACWR Over TSB
 
-TSB (Training Stress Balance) is what TrainingPeaks uses — it relies on power/pace zones and workout-level stress scores that require either a power meter or accurate pace data with a known fitness threshold. For casual runners tracking only distance and time, those inputs don't exist without calibration. ACWR works with raw mileage alone, making it accessible to any runner with a GPS watch. The tradeoff is less precision at high performance levels, but for injury-risk detection in recreational runners, the spike-vs-baseline signal is what matters.
+TSB (Training Stress Balance) is what TrainingPeaks uses — it relies on power/pace zones and workout-level stress scores that require either a power meter or accurate pace data with a known fitness threshold. For casual runners tracking only distance and time, those inputs don't exist without calibration. ACWR works with raw mileage alone, making it accessible to any runner with a GPS watch or smartphone. The tradeoff is less precision at high performance levels, but for injury-risk detection in recreational runners, the spike-vs-baseline signal is what matters.
 
 ## What's Next
 
-- Suggested mileage range for next week (already partially implemented via 10% rule in tooltips)
 - Strava API pagination for runners with 200+ activities
 - Persistence layer so users don't re-auth every visit
 
