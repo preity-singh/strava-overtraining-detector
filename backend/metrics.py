@@ -53,67 +53,83 @@ def fill_missing_weeks(weekly_mileage):
     
     return filled
 
-# Compute the Acute:Chronic Workload Ratio (ACWR) from weekly mileage
-def compute_acwr(weekly_mileage):
+CHRONIC_FLOOR = 3.0
+ALPHA_CHRONIC = 0.4  # 2 / (4 + 1), ~4-week decay
+
+def compute_acwr(weekly_mileage, activities):
     weeks = sorted(weekly_mileage.keys())
     results = []
+    chronic_ewma = CHRONIC_FLOOR
+
+    runs_by_week = defaultdict(list)
+    for a in activities:
+        week_start = get_week_start(a['date'])
+        runs_by_week[week_start].append({'date': a['date'].strftime('%b %d'), 'miles': a['miles']})
 
     for i, week in enumerate(weeks):
+        acute = weekly_mileage[week]
+
+        chronic_ewma = (acute * ALPHA_CHRONIC) + (chronic_ewma * (1 - ALPHA_CHRONIC))
+        chronic_ewma = max(chronic_ewma, CHRONIC_FLOOR)
+
         if i < 3:
             continue
 
-        acute = weekly_mileage[week] # current week mileage
-        last_4_weeks = [weekly_mileage.get(weeks[j], 0) for j in range(i-3, i+1)] # last 4 weeks mileage
-        prior_3_weeks = [weekly_mileage.get(weeks[j], 0) for j in range(i-3, i)] # prior 3 weeks only
-        chronic = sum(last_4_weeks) / 4 # average of last 4
-
         if acute == 0:
+            results.append({
+                'week': week.strftime('%Y-%m-%d'),
+                'acute_miles': 0,
+                'chronic_avg_miles': round(chronic_ewma, 1),
+                'acwr': None,
+                'risk': None,
+                'note': None,
+                'runs': []
+            })
             continue
 
-        if sum(prior_3_weeks) == 0 and acute > 0:
-            acwr = 0.0
-            risk = 'Returning'
-            suggested = round(acute * 1.1, 1)
-            note = f"Coming back from a break — aim for around {suggested}mi next week rather than jumping back to your old average."
+        acwr = round(acute / chronic_ewma, 2)
+
+        if acwr >= 1.5:
+            risk = 'High Risk'
+            safe_target = round(chronic_ewma * 1.3, 1)
+            note = f"Sharp spike — {acute}mi vs your {round(chronic_ewma, 1)}mi average. Dial back toward {safe_target}mi next week."
+        elif acwr >= 1.3:
+            risk = 'Moderate Risk'
+            note = f"Load creeping up — {acute}mi vs {round(chronic_ewma, 1)}mi average. Hold steady or ease back slightly."
+        elif acwr >= 0.8:
+            risk = 'Optimal'
+            note = "Well-balanced load — keep this consistency going."
         else:
-            acwr = round(acute / chronic, 2)
-            if acwr > 1.5:
-                risk = 'High Risk'
-                safe_target = round(chronic * 1.3, 1)
-                note = f"Sharp spike — {acute}mi vs your {round(chronic, 1)}mi average. Dial back toward {safe_target}mi next week."
-            elif acwr > 1.3:
-                risk = 'Moderate Risk'
-                note = f"Load creeping up — {acute}mi vs {round(chronic, 1)}mi average. Hold steady or ease back slightly."
-            elif acwr >= 0.8:
-                risk = 'Optimal'
-                note = "Well-balanced load — keep this consistency going."
+            risk = 'Reduced Conditioning'
+            suggested = round(acute * 1.1, 1)
+            if chronic_ewma <= CHRONIC_FLOOR + 0.5:
+                note = f"Coming back from a break — hold around {acute}mi or slightly more next week."
             else:
-                risk = 'Reduced Conditioning'
-                suggested = round(acute * 1.1, 1)
                 note = f"Below baseline — aim for around {suggested}mi next week rather than jumping back to your old average."
 
         results.append({
             'week': week.strftime('%Y-%m-%d'),
             'acute_miles': acute,
-            "chronic_avg_miles": round(chronic, 1),
+            'chronic_avg_miles': round(chronic_ewma, 1),
             'acwr': acwr,
             'risk': risk,
-            'note': note
+            'note': note,
+            'runs': runs_by_week.get(week, [])
         })
 
-    return results 
+    return results
 
-# Generate a summary of the ACWR results
 def get_summary(acwr_results):
-    if not acwr_results:
+    scored = [r for r in acwr_results if r['acwr'] is not None]
+    if not scored:
         return {'error': 'Not enough data to compute ACWR. At least 4 weeks of data is required.'}
-    
-    high_risk = [r for r in acwr_results if r['risk'] == 'High Risk']
-    moderate_risk = [r for r in acwr_results if r['risk'] == 'Moderate Risk']
-    peak = max(acwr_results, key=lambda x: x['acwr'])
+
+    high_risk = [r for r in scored if r['risk'] == 'High Risk']
+    moderate_risk = [r for r in scored if r['risk'] == 'Moderate Risk']
+    peak = max(scored, key=lambda x: x['acwr'])
 
     return {
-        'total_weeks': len(acwr_results),
+        'total_weeks': len(scored),
         'high_risk_weeks': len(high_risk),
         'moderate_risk_weeks': len(moderate_risk),
         'peak_acwr': peak['acwr'],
@@ -134,10 +150,13 @@ if __name__ == "__main__":
     for week, miles in weekly_mileage.items():
         print(f"  {week}: {miles} miles")
 
-    acwr_results = compute_acwr(weekly_mileage)
+    acwr_results = compute_acwr(weekly_mileage, activities)
     print("\nACWR Results:")
     for r in acwr_results:
-        print(f" {r['week']}: ACWR={r['acwr']} {r['risk']} (acute={r['acute_miles']}mi, chronic avg={r['chronic_avg_miles']}mi)")
+        if r['acwr'] is None:
+            print(f" {r['week']}: inactive week")
+        else:
+            print(f" {r['week']}: ACWR={r['acwr']} {r['risk']} (acute={r['acute_miles']}mi, chronic avg={r['chronic_avg_miles']}mi)")
 
     summary = get_summary(acwr_results)
     print("\nSummary:")

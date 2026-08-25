@@ -7,7 +7,6 @@ function Dashboard({ data }) {
     moderate: '#d97706',
     optimal: '#16a34a',
     reduced_conditioning: '#6366f1',
-    returning: '#f59e0b',
   };
 
   const riskLabels = {
@@ -15,17 +14,22 @@ function Dashboard({ data }) {
     moderate: 'Moderate Risk',
     optimal: 'Optimal',
     reduced_conditioning: 'Reduced Conditioning',
-    returning: 'Returning',
   };
 
   const CustomTooltip = ({ active, payload }) => {
     if (!active || !payload || !payload.length) return null;
     const point = payload[0].payload;
+    if (point.acwr === null) return null;
     return (
       <div className="chart-tooltip">
         <div className="chart-tooltip-header">{point.week}</div>
         <div className="chart-tooltip-stats">ACWR: {point.acwr} — {point.risk}</div>
         <div className="chart-tooltip-detail">{point.acute_miles}mi this week / {point.chronic_avg_miles}mi avg</div>
+        {point.runs && point.runs.length > 0 && (
+          <div className="chart-tooltip-runs">
+            Runs: {point.runs.map(r => `${r.date} (${r.miles}mi)`).join(', ')}
+          </div>
+        )}
         {point.note && <div className="chart-tooltip-note">{point.note}</div>}
       </div>
     );
@@ -78,7 +82,7 @@ function Dashboard({ data }) {
               <ReferenceLine y={0.8} stroke="#6366f1" strokeWidth={1.5} strokeDasharray="4 4" label={{ value: 'Reduced conditioning (0.8)', position: 'insideTopLeft', fill: '#6366f1', fontSize: 10 }} />
               <ReferenceLine y={1.3} stroke="#d97706" strokeWidth={1.5} strokeDasharray="4 4" label={{ value: 'Moderate risk (1.3)', position: 'insideTopLeft', fill: '#d97706', fontSize: 10 }} />
               <ReferenceLine y={1.5} stroke="#dc2626" strokeWidth={1.5} strokeDasharray="4 4" label={{ value: 'High risk (1.5)', position: 'insideTopLeft', fill: '#dc2626', fontSize: 10 }} />
-              <Line type="monotone" dataKey="acwr" stroke="var(--accent)" strokeWidth={2.5} dot={{ r: 5, fill: 'var(--accent)' }} activeDot={{ r: 8, fill: 'var(--accent)' }} />
+              <Line type="monotone" dataKey="acwr" stroke="var(--accent)" strokeWidth={2.5} dot={{ r: 5, fill: 'var(--accent)' }} activeDot={{ r: 8, fill: 'var(--accent)' }} connectNulls={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>

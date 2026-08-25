@@ -47,7 +47,7 @@ def process(code: str):
 
         weekly = compute_weekly_mileage(activities)
         weekly = fill_missing_weeks(weekly)
-        acwr_results = compute_acwr(weekly)
+        acwr_results = compute_acwr(weekly, activities)
         summary = get_summary(acwr_results)
 
         if 'error' in summary:
@@ -55,12 +55,11 @@ def process(code: str):
 
         coaching_note = get_coaching_note(summary)
 
-        recent = acwr_results[-3:]
-        risk_priority = ['High Risk', 'Returning', 'Moderate Risk', 'Reduced Conditioning', 'Optimal']
-        worst_risk = next(r for r in risk_priority if any(w['risk'] == r for w in recent))
+        recent = [w for w in acwr_results[-3:] if w['risk'] is not None]
+        risk_priority = ['High Risk', 'Moderate Risk', 'Reduced Conditioning', 'Optimal']
+        worst_risk = next((r for r in risk_priority if any(w['risk'] == r for w in recent)), 'Optimal')
         risk_level_map = {
             'High Risk': 'high',
-            'Returning': 'returning',
             'Moderate Risk': 'moderate',
             'Optimal': 'optimal',
             'Reduced Conditioning': 'reduced_conditioning',

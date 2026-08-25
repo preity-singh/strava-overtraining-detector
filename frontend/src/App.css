@@ -249,6 +249,13 @@
   color: var(--text);
 }
 
+.chart-tooltip-runs {
+  margin-top: 0.3rem;
+  font-size: 0.75rem;
+  color: var(--text);
+  opacity: 0.8;
+}
+
 .chart-tooltip-note {
   margin-top: 0.4rem;
   padding-top: 0.4rem;

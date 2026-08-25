@@ -10,18 +10,14 @@ def get_coaching_note(summary):
     if 'error' in summary:
         return "Not enough training history yet to assess overtraining risk."
 
-    risk_weeks = [w for w in summary['all_weeks'] if w['risk'] in ('High Risk', 'Returning', 'Moderate Risk', 'Reduced Conditioning')]
-    return_weeks = [w for w in summary['all_weeks'] if w['risk'] == 'Returning']
+    risk_weeks = [w for w in summary['all_weeks'] if w['risk'] in ('High Risk', 'Moderate Risk', 'Reduced Conditioning')]
     reduced_weeks = [w for w in summary['all_weeks'] if w['risk'] == 'Reduced Conditioning']
 
     risk_weeks_text = "\n".join([
         f"- {w['week']}: ACWR {w['acwr']} ({w['risk']}) - {w['acute_miles']}mi vs {w['chronic_avg_miles']}mi avg" +
-        (" [returning from break — no baseline to compare, just needs gradual reentry]" if w['risk'] == 'Returning' else "") +
         (" [training load well below baseline — flag if they're about to ramp up]" if w['risk'] == 'Reduced Conditioning' else "")
         for w in risk_weeks
     ]) if risk_weeks else "No weeks with elevated risk."
-
-    return_context = f"\n\nNote: {len(return_weeks)} week(s) flagged as Returning — the runner came back after an extended break with no prior load to compare against. This isn't alarming, but the body has lost some adaptation, so even a modest week is a bigger adjustment than it looks. Gradual reentry over several weeks is ideal." if return_weeks else ""
 
     reduced_context = f"\n\nNote: {len(reduced_weeks)} week(s) flagged as Reduced Conditioning (ACWR < 0.8) — recent load has dropped well below this runner's baseline. This is not a problem right now, but if they're planning to increase mileage soon, they should do it gradually. The risk is about a future ramp-up, not the lower mileage itself." if reduced_weeks else ""
 
@@ -35,9 +31,9 @@ def get_coaching_note(summary):
     - That peak week: {summary['peak_acute_miles']} miles, vs a 4-week average of {summary['peak_chronic_avg_miles']} miles
 
     Individual weeks flagged:
-    {risk_weeks_text}{return_context}{reduced_context}
+    {risk_weeks_text}{reduced_context}
 
-    ACWR (Acute:Chronic Workload Ratio) compares a runner's current week to their 4-week average. The five bands are: below 0.8 is Reduced Conditioning (risk is about a future ramp-up, not current load); 0.8–1.3 is Optimal; above 1.3 is Moderate Risk; above 1.5 is High Risk; and Returning (coming back after an extended break — no meaningful ratio, just a note to ease back in gradually).
+    ACWR (Acute:Chronic Workload Ratio) compares a runner's current week to their exponentially weighted chronic average (recent weeks count more, old weeks decay). A chronic floor of 3mi prevents ratio blow-up for low-volume runners. The four bands are: below 0.8 is Reduced Conditioning (risk is about a future ramp-up, not current load); 0.8–1.3 is Optimal; above 1.3 is Moderate Risk; above 1.5 is High Risk. Inactive weeks (0 miles) are skipped — no ratio is computed.
 
     Write a 2-3 sentence coaching note summarizing what this history means for this runner going forward. Rules:
     - Be specific: use actual mileage numbers and dates from the data
@@ -67,7 +63,7 @@ if __name__ == '__main__':
     activities = load_activities('data/synthetic_activities.json')
     weekly = compute_weekly_mileage(activities)
     weekly = fill_missing_weeks(weekly)
-    acwr_results = compute_acwr(weekly)
+    acwr_results = compute_acwr(weekly, activities)
     summary = get_summary(acwr_results)
 
     note = get_coaching_note(summary)
