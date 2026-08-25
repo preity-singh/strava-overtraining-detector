@@ -10,7 +10,7 @@ Runners increase mileage too quickly all the time and often without realizing it
 
 ## The Approach: ACWR
 
-This tool is built around **Acute:Chronic Workload Ratio (ACWR)**, a sports-science metric that compares your current week's mileage to an exponentially weighted chronic average. Recent weeks count more, old weeks fade gradually (no cliff effect), and a chronic floor of 3mi prevents ratio blow-up for low-volume runners. The ratio matters more than absolute mileage — a spike is relative to what your body has recently been doing.
+This tool is built around **Acute:Chronic Workload Ratio (ACWR)**, a sports-science metric that compares your current week's mileage to a weighted average of your recent history. Recent weeks count more, old weeks fade gradually, and a chronic floor prevents the math from overreacting to low mileage. The ratio matters more than absolute mileage — a spike is relative to what your body has recently been doing.
 
 ![ACWR info toggle with definition and Learn more link](images/ACWR.png)
 
@@ -31,15 +31,17 @@ Hover over any data point to see the ACWR value, risk band, mileage context, and
 
 | Band | Example |
 |------|---------|
-| High Risk | ![High Risk tooltip](images/HighRisk.png) |
-| Optimal | ![Optimal tooltip](images/Optimal.png) |
+| Moderate Risk | ![Moderate Risk tooltip](images/ModerateRisk.png) |
 | Reduced Conditioning | ![Reduced Conditioning tooltip](images/ReducedConditioning.png) |
+| Reduced Conditioning (Floor) | ![Chronic floor in action](images/ReducedConditioningFloor.png) |
 
 ## Full Dashboard
 
 The dashboard shows your current risk status, summary stats, an interactive ACWR timeline with labeled thresholds and a shaded Optimal zone, and an LLM-generated coaching note with forward-looking guidance.
 
-![Full dashboard view](images/UserState.png)
+![Full dashboard view](images/UserPage.png)
+
+![Coaching note](images/CoachingNote.png)
 
 ## How It Works
 
@@ -48,7 +50,7 @@ User clicks "Connect with Strava"
   → OAuth login via Strava
   → Backend fetches activity history
   → Python computes weekly mileage, fills gaps, calculates ACWR per week
-  → Groq (Llama 3.3 70B) generates a coaching note from the pre-computed data
+  → Groq LLM generates a coaching note from the pre-computed data
   → React dashboard displays risk summary, timeline chart, and note
 ```
 
@@ -61,7 +63,7 @@ Fully responsive and dark-mode compatible out of the box:
 <p align="center">
   <img src="images/TitlePagePhone.PNG" width="250" alt="Landing page on iPhone (dark mode)" />
   &nbsp;&nbsp;
-  <img src="images/UserStatePhone.PNG" width="250" alt="Dashboard on iPhone (dark mode)" />
+  <img src="images/UserPagePhone.PNG" width="250" alt="Dashboard on iPhone (dark mode)" />
   &nbsp;&nbsp;
   <img src="images/CoachingNotePhone.PNG" width="250" alt="Coaching note on iPhone (dark mode)" />
 </p>
@@ -70,7 +72,7 @@ Fully responsive and dark-mode compatible out of the box:
 
 - **Backend:** FastAPI (Python) — OAuth, pipeline orchestration
 - **Metrics:** Custom Python — weekly aggregation, gap-filling, EWMA-based ACWR with chronic floor
-- **LLM:** Groq (Llama 3.3 70B) — coaching note generation from pre-computed metrics
+- **LLM:** Groq — coaching note generation from pre-computed metrics
 - **Frontend:** React (Vite) + Recharts
 - **Deployment:** Vercel (frontend) + Railway (backend)
 
@@ -104,6 +106,22 @@ Strava's Authorization Callback Domain points to the Railway domain.
 ## A Note on Strava API Access
 
 As of June 2026, Strava requires an active paid subscription for developer API access. This project was built and tested with a live subscription. The screenshots and recorded demo reflect the fully working app.
+
+## Why EWMA Over Rolling Average
+
+The standard way to calculate ACWR uses a simple rolling average: add up the last 4 weeks and divide by 4. The problem is that week 5 data drops from full influence to zero overnight — a "cliff" that doesn't reflect how fitness actually works. Your body doesn't forget a 15-mile week the instant it's 29 days old.
+
+EWMA (Exponentially Weighted Moving Average) fixes this by decaying old weeks gradually:
+
+```
+chronic = (this_week × 0.4) + (previous_chronic × 0.6)
+```
+
+Each week, 40% of the weight goes to the new data and 60% carries forward from before. A big week from a month ago still contributes about 13% of its original influence (0.6⁴ ≈ 0.13) rather than disappearing entirely. This produces smoother, more realistic baselines — especially for runners with inconsistent schedules.
+
+### Chronic Floor (3.0 miles)
+
+Without a floor, the math breaks for low-volume runners. If someone averages 1 mile/week and then runs 3 miles, a pure ratio gives ACWR = 3.0 (extreme high risk) — but 3 miles isn't dangerous for anyone regardless of history. The chronic floor caps the denominator at 3.0 miles minimum, so the ratio stays grounded in reality when absolute mileage is too low to cause injury.
 
 ## Why ACWR Over TSB
 
