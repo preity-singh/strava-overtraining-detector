@@ -19,7 +19,6 @@ function Dashboard({ data }) {
   const CustomTooltip = ({ active, payload }) => {
     if (!active || !payload || !payload.length) return null;
     const point = payload[0].payload;
-    if (point.acwr === null) return null;
     return (
       <div className="chart-tooltip">
         <div className="chart-tooltip-header">{point.week}</div>
@@ -82,7 +81,7 @@ function Dashboard({ data }) {
               <ReferenceLine y={0.8} stroke="#6366f1" strokeWidth={1.5} strokeDasharray="4 4" label={{ value: 'Reduced conditioning (0.8)', position: 'insideTopLeft', fill: '#6366f1', fontSize: 10 }} />
               <ReferenceLine y={1.3} stroke="#d97706" strokeWidth={1.5} strokeDasharray="4 4" label={{ value: 'Moderate risk (1.3)', position: 'insideTopLeft', fill: '#d97706', fontSize: 10 }} />
               <ReferenceLine y={1.5} stroke="#dc2626" strokeWidth={1.5} strokeDasharray="4 4" label={{ value: 'High risk (1.5)', position: 'insideTopLeft', fill: '#dc2626', fontSize: 10 }} />
-              <Line type="monotone" dataKey="acwr" stroke="var(--accent)" strokeWidth={2.5} dot={{ r: 5, fill: 'var(--accent)' }} activeDot={{ r: 8, fill: 'var(--accent)' }} connectNulls={false} />
+              <Line type="monotone" dataKey="acwr" stroke="var(--accent)" strokeWidth={2.5} dot={{ r: 5, fill: 'var(--accent)' }} activeDot={{ r: 8, fill: 'var(--accent)' }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
